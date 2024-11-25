@@ -47,7 +47,6 @@ func CreateUser(c *gin.Context) {
 		utils.RespondJSON(c, http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
-	models.MigrateModels()
 
 	if err := models.CreateUser(&user); err != nil {
 		utils.RespondJSON(c, http.StatusInternalServerError, gin.H{"error": "Unable to create user"})

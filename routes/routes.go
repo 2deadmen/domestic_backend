@@ -3,6 +3,7 @@ package routes
 import (
 	"github.com/2deadmen/domestic_backend/controllers"
 	_ "github.com/2deadmen/domestic_backend/docs" // Import the generated docs
+	"github.com/2deadmen/domestic_backend/models"
 
 	// "github.com/2deadmen/domestic_backend/middlewares"
 	"github.com/gin-gonic/gin"
@@ -16,6 +17,9 @@ import (
 // @Tags Routes
 func InitRoutes() *gin.Engine {
 	router := gin.Default()
+
+	// Migrate the database models to the database
+	models.MigrateModels()
 
 	//middleware
 
