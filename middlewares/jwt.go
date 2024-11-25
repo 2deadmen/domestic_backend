@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -9,7 +10,7 @@ import (
 )
 
 // Your secret key (use a secure method to store this)
-var jwtSecret = []byte("your-secret-key")
+var jwtSecret = os.Getenv("JWT_SECRET")
 
 // JWTMiddleware verifies the JWT token
 func JWTMiddleware() gin.HandlerFunc {

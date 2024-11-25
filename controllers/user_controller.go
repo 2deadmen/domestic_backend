@@ -18,11 +18,15 @@ import (
 // @Failure 500 {object} map[string]string
 // @Router /users [get]
 func GetUsers(c *gin.Context) {
+
+	// Fetch all users
 	users, err := models.GetAllUsers()
 	if err != nil {
 		utils.RespondJSON(c, http.StatusInternalServerError, gin.H{"error": "Unable to fetch users"})
 		return
 	}
+
+	// Respond with the combined data
 	utils.RespondJSON(c, http.StatusOK, users)
 }
 

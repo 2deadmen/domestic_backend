@@ -3,6 +3,8 @@ package routes
 import (
 	"github.com/2deadmen/domestic_backend/controllers"
 	_ "github.com/2deadmen/domestic_backend/docs" // Import the generated docs
+
+	// "github.com/2deadmen/domestic_backend/middlewares"
 	"github.com/gin-gonic/gin"
 	files "github.com/swaggo/files" // Swagger embed files
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -15,13 +17,15 @@ import (
 func InitRoutes() *gin.Engine {
 	router := gin.Default()
 
+	//middleware
+
 	// Swagger route
 	// @Summary Swagger UI
 	// @Description Serve Swagger API documentation
 	// @Tags Documentation
 	// @Router /swagger/*any [get]
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(files.Handler))
-
+	// router.Use(middlewares.JWTMiddleware())
 	// User routes
 	userGroup := router.Group("/users")
 	{
