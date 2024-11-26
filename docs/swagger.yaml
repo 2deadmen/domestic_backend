@@ -1,4 +1,31 @@
 definitions:
+  models.Employer:
+    properties:
+      addressproof:
+        type: string
+      age:
+        type: integer
+      created_at:
+        type: string
+      email:
+        type: string
+      gender:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      otp:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+    type: object
   models.User:
     properties:
       email:
@@ -11,6 +38,170 @@ definitions:
 info:
   contact: {}
 paths:
+  /employers:
+    get:
+      description: Retrieve a list of all employers
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Employer'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all employers
+      tags:
+      - Employers
+    post:
+      consumes:
+      - application/json
+      description: Sign up a new employer with email and password
+      parameters:
+      - description: Employer Data
+        in: body
+        name: employer
+        required: true
+        schema:
+          $ref: '#/definitions/models.Employer'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register a new employer
+      tags:
+      - Employers
+  /employers/{id}:
+    delete:
+      description: Remove an employer by ID
+      parameters:
+      - description: Employer ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete an employer
+      tags:
+      - Employers
+    get:
+      description: Retrieve an employer's details
+      parameters:
+      - description: Employer ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Employer'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get an employer by ID
+      tags:
+      - Employers
+    put:
+      consumes:
+      - application/json
+      description: Modify an employer's details
+      parameters:
+      - description: Employer ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated Employer Data
+        in: body
+        name: employer
+        required: true
+        schema:
+          $ref: '#/definitions/models.Employer'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update an employer
+      tags:
+      - Employers
   /users:
     get:
       description: Fetch all users from the database

@@ -49,5 +49,69 @@ func InitRoutes() *gin.Engine {
 		userGroup.POST("/", controllers.CreateUser)
 	}
 
+	// Employer routes
+	employerGroup := router.Group("/employers")
+	{
+		// @Summary Register a new employer
+		// @Description Add a new employer with email and password
+		// @Tags Employers
+		// @Accept json
+		// @Produce json
+		// @Param employer body models.Employer true "Employer Data"
+		// @Success 201 {object} map[string]interface{}
+		// @Failure 400 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /employers [post]
+
+		employerGroup.POST("/", controllers.CreateEmployer)
+
+		// GetAllEmployers godoc
+		// @Summary Get all employers
+		// @Description Retrieve a list of all employers
+		// @Tags Employers
+		// @Produce json
+		// @Success 200 {array} models.Employer
+		// @Failure 500 {object} map[string]string
+		// @Router /employers [get]
+		employerGroup.GET("/", controllers.GetAllEmployers)
+
+		// @Summary Get an employer by ID
+		// @Description Retrieve an employer's details using their ID
+		// @Tags Employers
+		// @Produce json
+		// @Param id path int true "Employer ID"
+		// @Success 200 {object} models.Employer
+		// @Failure 404 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /employers/{id} [get]
+
+		employerGroup.GET("/:id", controllers.GetEmployer)
+
+		// @Summary Update an employer by ID
+		// @Description Modify an employer's details using their ID
+		// @Tags Employers
+		// @Accept json
+		// @Produce json
+		// @Param id path int true "Employer ID"
+		// @Param employer body models.Employer true "Updated Employer Data"
+		// @Success 200 {object} map[string]string
+		// @Failure 400 {object} map[string]string
+		// @Failure 404 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /employers/{id} [put]
+		employerGroup.PUT("/:id", controllers.UpdateEmployer)
+
+		// @Summary Delete an employer by ID
+		// @Description Remove an employer from the database using their ID
+		// @Tags Employers
+		// @Produce json
+		// @Param id path int true "Employer ID"
+		// @Success 200 {object} map[string]string
+		// @Failure 404 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /employers/{id} [delete]
+		employerGroup.DELETE("/:id", controllers.DeleteEmployer)
+	}
+
 	return router
 }
