@@ -25,15 +25,8 @@ definitions:
         type: string
       updated_at:
         type: string
-    type: object
-  models.User:
-    properties:
-      email:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
+      verified:
+        type: boolean
     type: object
 info:
   contact: {}
@@ -202,58 +195,90 @@ paths:
       summary: Update an employer
       tags:
       - Employers
-  /users:
-    get:
-      description: Fetch all users from the database
+  /employers/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Log in an employer with email and password
+      parameters:
+      - description: Email and Password
+        in: body
+        name: credentials
+        required: true
+        schema:
+          additionalProperties:
+            type: string
+          type: object
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/models.User'
-            type: array
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
+            additionalProperties: true
             type: object
-      summary: Get all users
-      tags:
-      - Users
-    post:
-      consumes:
-      - application/json
-      description: Add a new user to the database
-      parameters:
-      - description: User Data
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/models.User'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/models.User'
         "400":
           description: Bad Request
           schema:
             additionalProperties:
               type: string
             type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
         "500":
           description: Internal Server Error
           schema:
             additionalProperties:
               type: string
             type: object
-      summary: Create a new user
+      summary: Sign in an employer
       tags:
-      - Users
+      - Employers
+  /employers/verify-otp:
+    post:
+      consumes:
+      - application/json
+      description: Verify OTP for an employer and mark as verified
+      parameters:
+      - description: OTP and Email
+        in: body
+        name: otp
+        required: true
+        schema:
+          additionalProperties:
+            type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Verify an employer's OTP
+      tags:
+      - Employers
 swagger: "2.0"

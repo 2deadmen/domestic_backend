@@ -30,24 +30,6 @@ func InitRoutes() *gin.Engine {
 	// @Router /swagger/*any [get]
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(files.Handler))
 	// router.Use(middlewares.JWTMiddleware())
-	// User routes
-	userGroup := router.Group("/users")
-	{
-		// @Summary Get all users
-		// @Description Retrieve a list of all users
-		// @Tags Users
-		// @Produce json
-		// @Router /users [get]
-		userGroup.GET("/", controllers.GetUsers)
-
-		// @Summary Create a new user
-		// @Description Add a new user to the system
-		// @Tags Users
-		// @Accept json
-		// @Produce json
-		// @Router /users [post]
-		userGroup.POST("/", controllers.CreateUser)
-	}
 
 	// Employer routes
 	employerGroup := router.Group("/employers")
@@ -64,6 +46,34 @@ func InitRoutes() *gin.Engine {
 		// @Router /employers [post]
 
 		employerGroup.POST("/", controllers.CreateEmployer)
+
+		// VerifyOTP godoc
+		// @Summary Verify OTP for an employer
+		// @Description Validate the OTP sent to the employer's email and activate the account
+		// @Tags Employers
+		// @Accept json
+		// @Produce json
+		// @Param otp body models.VerifyOTPRequest true "OTP Verification Data"
+		// @Success 200 {object} map[string]interface{}
+		// @Failure 400 {object} map[string]string
+		// @Failure 404 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /employers/verify-otp [post]
+		employerGroup.POST("/verify-otp", controllers.VerifyOTP)
+
+		// SignIn godoc
+		// @Summary Sign in an employer
+		// @Description Authenticate an employer using email and password, and return a JWT
+		// @Tags Employers
+		// @Accept json
+		// @Produce json
+		// @Param credentials body models.SignInRequest true "Sign In Credentials"
+		// @Success 200 {object} map[string]interface{}
+		// @Failure 400 {object} map[string]string
+		// @Failure 401 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /employers/sign-in [post]
+		employerGroup.POST("/sign-in", controllers.SignIn)
 
 		// GetAllEmployers godoc
 		// @Summary Get all employers

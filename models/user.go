@@ -29,6 +29,7 @@ type Employer struct {
 	AddressProof string    `json:"addressproof"`
 	Type         string    `json:"type"`
 	OTP          string    `json:"otp"`
+	Verified     bool      `json:"verified" gorm:"default:false"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
@@ -44,6 +45,7 @@ type Employee struct {
 	WorkExperience string    `json:"workexperience"`
 	TypeOfWork     []string  `json:"typeofwork" gorm:"type:json"`
 	PhotoURL       string    `json:"photourl"`
+	Verified       bool      `json:"verified" gorm:"default:false"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }
@@ -90,6 +92,18 @@ func CreateEmployer(employer *Employer) error {
 		return errors.Wrap(err, "failed to create employer")
 	}
 	return nil
+}
+
+// get employer by mail
+func GetEmployerByEmail(email string) (Employer, error) {
+	var employer Employer
+	err := services.DB.Where("email = ?", email).First(&employer).Error
+	return employer, err
+}
+
+// update employer
+func UpdateEmployer(employer *Employer) error {
+	return services.DB.Save(employer).Error
 }
 
 // GetAllEmployers retrieves all employers from the database
