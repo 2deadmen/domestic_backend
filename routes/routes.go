@@ -121,6 +121,83 @@ func InitRoutes() *gin.Engine {
 		// @Failure 500 {object} map[string]string
 		// @Router /employers/{id} [delete]
 		employerGroup.DELETE("/:id", controllers.DeleteEmployer)
+
+	}
+
+	//    --------------------------------------------------------------------------------------------------------------------------------
+
+	// Employee routes group
+	employeeRoutes := router.Group("/employees")
+	{
+		// @Summary Register a new employee
+		// @Description Sign up a new employee
+		// @Tags Employees
+		// @Accept json
+		// @Produce json
+		// @Param employee body models.Employee true "Employee Data"
+		// @Success 201 {object} map[string]interface{}
+		// @Failure 400 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /employees [post]
+		employeeRoutes.POST("", controllers.CreateEmployee)
+
+		// @Summary Sign in an employee
+		// @Description Log in an employee with phone and pin
+		// @Tags Employees
+		// @Accept json
+		// @Produce json
+		// @Param credentials body map[string]string true "Phone and Pin"
+		// @Success 200 {object} map[string]interface{}
+		// @Failure 400 {object} map[string]string
+		// @Failure 401 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /employees/sign-in [post]
+		employeeRoutes.POST("/sign-in", controllers.SignInEmployee)
+
+		// @Summary Get all employees
+		// @Description Retrieve a list of all employees
+		// @Tags Employees
+		// @Produce json
+		// @Success 200 {array} models.Employee
+		// @Failure 500 {object} map[string]string
+		// @Router /employees [get]
+		employeeRoutes.GET("", controllers.GetAllEmployees)
+
+		// @Summary Get an employee by ID
+		// @Description Retrieve an employee's details
+		// @Tags Employees
+		// @Produce json
+		// @Param id path int true "Employee ID"
+		// @Success 200 {object} models.Employee
+		// @Failure 404 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /employees/{id} [get]
+		employeeRoutes.GET(":id", controllers.GetEmployee)
+
+		// @Summary Update an employee
+		// @Description Modify an employee's details
+		// @Tags Employees
+		// @Accept json
+		// @Produce json
+		// @Param id path int true "Employee ID"
+		// @Param employee body models.Employee true "Updated Employee Data"
+		// @Success 200 {object} map[string]string
+		// @Failure 400 {object} map[string]string
+		// @Failure 404 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /employees/{id} [put]
+		employeeRoutes.PUT(":id", controllers.UpdateEmployee)
+
+		// @Summary Delete an employee
+		// @Description Remove an employee by ID
+		// @Tags Employees
+		// @Produce json
+		// @Param id path int true "Employee ID"
+		// @Success 200 {object} map[string]string
+		// @Failure 404 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /employees/{id} [delete]
+		employeeRoutes.DELETE(":id", controllers.DeleteEmployee)
 	}
 
 	return router

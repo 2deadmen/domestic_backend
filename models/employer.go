@@ -10,13 +10,6 @@ import (
 
 //  models
 
-// dummy
-type User struct {
-	ID    uint   `json:"id" gorm:"primaryKey"`
-	Name  string `json:"name"`
-	Email string `json:"email" gorm:"unique"`
-}
-
 // real
 type Employer struct {
 	ID           uint      `json:"id" gorm:"primaryKey"`
@@ -36,7 +29,7 @@ type Employer struct {
 type Employee struct {
 	ID             uint      `json:"id" gorm:"primaryKey"`
 	Name           string    `json:"name"`
-	Pin            uint64    `json:"pin" `
+	Pin            string    `json:"pin" `
 	Age            int       `json:"age"`
 	Gender         string    `json:"gender"`
 	Phone          string    `json:"phone" `
@@ -55,24 +48,12 @@ func MigrateModels() {
 	log.Println("Starting database migrations...")
 
 	// Perform auto-migration for all models
-	err := services.DB.AutoMigrate(&User{}, &Employee{}, &Employer{})
+	err := services.DB.AutoMigrate(&Employee{}, &Employer{})
 	if err != nil {
 		log.Fatalf("Failed to migrate database models: %v", err)
 	}
 
 	log.Println("Database migrations completed successfully.")
-}
-
-// Get all users
-func GetAllUsers() ([]User, error) {
-	var users []User
-	err := services.DB.Find(&users).Error
-	return users, err
-}
-
-// Create a new user
-func CreateUser(user *User) error {
-	return services.DB.Create(user).Error
 }
 
 // CheckEmailExists checks if an email is already registered in the database
