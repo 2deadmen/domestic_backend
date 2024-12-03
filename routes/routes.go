@@ -200,5 +200,105 @@ func InitRoutes() *gin.Engine {
 		employeeRoutes.DELETE(":id", controllers.DeleteEmployee)
 	}
 
+	//    --------------------------------------------------------------------------------------------------------------------------------
+
+	// JobCard routes group
+	jobCardRoutes := router.Group("/jobcards")
+	{
+		// @Summary Create a new job card
+		// @Description Add a new job card
+		// @Tags JobCards
+		// @Accept json
+		// @Produce json
+		// @Param jobCard body JobCard true "Job Card Data"
+		// @Success 201 {object} map[string]interface{}
+		// @Failure 400 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /jobcards [post]
+		jobCardRoutes.POST("", controllers.CreateJobCard)
+
+		// @Summary Get all job cards
+		// @Description Retrieve a list of all job cards
+		// @Tags JobCards
+		// @Produce json
+		// @Success 200 {array} JobCard
+		// @Failure 500 {object} map[string]string
+		// @Router /jobcards [get]
+		jobCardRoutes.GET("", controllers.GetAllJobCards)
+
+		// @Summary Get a job card by ID
+		// @Description Retrieve a job card's details
+		// @Tags JobCards
+		// @Produce json
+		// @Param id path int true "Job Card ID"
+		// @Success 200 {object} JobCard
+		// @Failure 404 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /jobcards/{id} [get]
+		jobCardRoutes.GET(":id", controllers.GetJobCard)
+
+		// @Summary Update a job card
+		// @Description Modify a job card's details
+		// @Tags JobCards
+		// @Accept json
+		// @Produce json
+		// @Param id path int true "Job Card ID"
+		// @Param jobCard body JobCard true "Updated Job Card Data"
+		// @Success 200 {object} map[string]string
+		// @Failure 400 {object} map[string]string
+		// @Failure 404 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /jobcards/{id} [put]
+		jobCardRoutes.PUT(":id", controllers.UpdateJobCard)
+
+		// @Summary Delete a job card
+		// @Description Remove a job card by ID
+		// @Tags JobCards
+		// @Produce json
+		// @Param id path int true "Job Card ID"
+		// @Success 200 {object} map[string]string
+		// @Failure 404 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /jobcards/{id} [delete]
+		jobCardRoutes.DELETE(":id", controllers.DeleteJobCard)
+
+		// @Summary Get active job cards
+		// @Description Retrieve all active job cards
+		// @Tags JobCards
+		// @Produce json
+		// @Success 200 {array} JobCard
+		// @Failure 500 {object} map[string]string
+		// @Router /jobcards/active [get]
+		jobCardRoutes.GET("/active", controllers.GetActiveJobCards)
+
+		// @Summary Update the active status of a job card
+		// @Description Set a job card's active status to true or false
+		// @Tags JobCards
+		// @Accept json
+		// @Produce json
+		// @Param id path int true "Job Card ID"
+		// @Param active body map[string]bool true "Active Status"
+		// @Success 200 {object} map[string]string
+		// @Failure 400 {object} map[string]string
+		// @Failure 404 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /jobcards/{id}/active [put]
+		jobCardRoutes.PUT(":id/active", controllers.UpdateJobCardActiveStatus)
+
+		// @Summary Handle job application
+		// @Description Accept or reject a job application
+		// @Tags JobApplications
+		// @Accept json
+		// @Produce json
+		// @Param id path int true "Application ID"
+		// @Param status body map[string]string true "Application Status (accepted/rejected)"
+		// @Success 200 {object} map[string]string
+		// @Failure 400 {object} map[string]string
+		// @Failure 404 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /applications/{id}/status [put]
+		jobCardRoutes.PUT("/applications/:id/status", controllers.HandleJobApplicationStatus)
+	}
+
 	return router
 }
