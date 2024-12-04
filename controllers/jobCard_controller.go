@@ -12,6 +12,7 @@ import (
 // @Summary create a job card
 func CreateJobCard(c *gin.Context) {
 	var jobCard models.JobCard
+
 	if err := c.ShouldBindJSON(&jobCard); err != nil {
 		utils.RespondJSON(c, http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return
@@ -161,6 +162,7 @@ func HandleJobApplicationStatus(c *gin.Context) {
 	if requestBody.Status != "accepted" && requestBody.Status != "rejected" {
 		utils.RespondJSON(c, http.StatusBadRequest, gin.H{"error": "Status must be 'accepted' or 'rejected'"})
 		return
+
 	}
 
 	if err := models.UpdateJobApplicationStatusByID(id, requestBody.Status); err != nil {

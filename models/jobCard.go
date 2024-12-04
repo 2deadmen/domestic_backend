@@ -1,41 +1,45 @@
 package models
 
 import (
+	"log"
+
 	"github.com/2deadmen/domestic_backend/services"
+	"github.com/lib/pq"
 	"github.com/pkg/errors"
-	"time"
 )
 
-type JobCard struct {
-	Id                      int       `json:"id" gorm:"primaryKey"`
-	Pincode                 int       `json:"pincode"`
-	Location                string    `json:"location"`
-	Gender                  string    `json:"gender"`
-	JobType                 []string  `json:"jobType" gorm:"type:text"`
-	Salary                  string    `json:"salary"`
-	Duration                string    `json:"duration"`
-	ExperienceReq           string    `json:"experienceReq"`
-	EmployementAvailability time.Time `json:"employementAvailability"`
-	WorkingHours            string    `json:"workingHours"`
-	Holidays                string    `json:"holidays"`
-	EmployerId              int       `json:"employerId" gorm:"foreignKey"`
-	Vacancy                 int       `json:"vacancy"`
-	Active                  bool      `json:"active"`
-}
-
-type JobApplication struct {
-	Id         int    `json:"id" gorm:"primaryKey"`
-	EmployerId int    `json:"employerId" gorm:"foreignKey"`
-	EmployeeId int    `json:"employeeId" gorm:"foreignKey"`
-	JobId      int    `json:"jobId" gorm:"foreignKey"`
-	Status     string `json:"status"` // "accepted" or "rejected"
-}
-
 // CreateJobCard inserts a new JobCard into the database.
+
 func CreateJobCard(jobCard *JobCard) error {
-	if err := services.DB.Create(jobCard).Error; err != nil {
+	// Debug: Print jobType for verification
+	log.Printf("JobType: %v", jobCard.JobType)
+
+	// Prepare query with pq.Array for jobType
+	query := `
+		INSERT INTO job_cards 
+		(pincode, location, gender, job_type, salary, duration, experience_req, employement_availability, working_hours, holidays, employer_id, vacancy, active)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+		RETURNING id`
+
+	// Using pq.Array to serialize the jobType slice to text[]
+	if err := services.DB.Exec(query,
+		jobCard.Pincode,                 // pincode
+		jobCard.Location,                // location
+		jobCard.Gender,                  // gender
+		pq.Array(jobCard.JobType),       // job_type as TEXT[]
+		jobCard.Salary,                  // salary
+		jobCard.Duration,                // duration
+		jobCard.ExperienceReq,           // experience_req
+		jobCard.EmployementAvailability, // employement_availability
+		jobCard.WorkingHours,            // working_hours
+		jobCard.Holidays,                // holidays
+		jobCard.EmployerId,              // employer_id
+		jobCard.Vacancy,                 // vacancy
+		jobCard.Active,                  // active
+	).Error; err != nil {
 		return errors.Wrap(err, "failed to create job card")
 	}
+
 	return nil
 }
 

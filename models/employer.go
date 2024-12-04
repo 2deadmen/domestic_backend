@@ -2,7 +2,6 @@ package models
 
 import (
 	"log"
-	"time"
 
 	"github.com/2deadmen/domestic_backend/services"
 	"github.com/pkg/errors"
@@ -11,44 +10,13 @@ import (
 //  models
 
 // real
-type Employer struct {
-	ID           uint      `json:"id" gorm:"primaryKey"`
-	Name         string    `json:"name"`
-	Email        string    `json:"email" gorm:"unique"`
-	Password     string    `json:"password"`
-	Age          int       `json:"age"`
-	Gender       string    `json:"gender"`
-	Phone        string    `json:"phone" `
-	AddressProof string    `json:"addressproof"`
-	Type         string    `json:"type"`
-	OTP          string    `json:"otp"`
-	Verified     bool      `json:"verified" gorm:"default:false"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
-}
-type Employee struct {
-	ID             uint      `json:"id" gorm:"primaryKey"`
-	Name           string    `json:"name"`
-	Pin            string    `json:"pin" `
-	Age            int       `json:"age"`
-	Gender         string    `json:"gender"`
-	Phone          string    `json:"phone" `
-	AddressProof   string    `json:"addressproof"`
-	OpenToWork     bool      `json:"opentowork"`
-	WorkExperience string    `json:"workexperience"`
-	TypeOfWork     []string  `json:"typeofwork" gorm:"type:json"`
-	PhotoURL       string    `json:"photourl"`
-	Verified       bool      `json:"verified" gorm:"default:false"`
-	CreatedAt      time.Time `json:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at"`
-}
 
 // MigrateModels ensures that the database schema matches the models
 func MigrateModels() {
 	log.Println("Starting database migrations...")
 
 	// Perform auto-migration for all models
-	err := services.DB.AutoMigrate(&Employee{}, &Employer{})
+	err := services.DB.AutoMigrate(&Employee{}, &Employer{}, &JobApplication{}, &JobCard{})
 	if err != nil {
 		log.Fatalf("Failed to migrate database models: %v", err)
 	}
