@@ -29,7 +29,14 @@ func InitRoutes() *gin.Engine {
 	// @Tags Documentation
 	// @Router /swagger/*any [get]
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(files.Handler))
+
 	// router.Use(middlewares.JWTMiddleware())
+
+	//testing to be done with jwt tokens and all other unit tests are to be done
+	//
+	//
+	//
+	//
 
 	// Employer routes
 	employerGroup := router.Group("/employers")
