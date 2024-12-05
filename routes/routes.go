@@ -285,19 +285,13 @@ func InitRoutes() *gin.Engine {
 		// @Router /jobcards/{id}/active [put]
 		jobCardRoutes.PUT(":id/active", controllers.UpdateJobCardActiveStatus)
 
-		// @Summary Handle job application
-		// @Description Accept or reject a job application
-		// @Tags JobApplications
-		// @Accept json
-		// @Produce json
-		// @Param id path int true "Application ID"
-		// @Param status body map[string]string true "Application Status (accepted/rejected)"
-		// @Success 200 {object} map[string]string
-		// @Failure 400 {object} map[string]string
-		// @Failure 404 {object} map[string]string
-		// @Failure 500 {object} map[string]string
-		// @Router /applications/{id}/status [put]
-		jobCardRoutes.PUT("/applications/:id/status", controllers.HandleJobApplicationStatus)
+	}
+
+	jobApplicationGroup := router.Group("/job-applications")
+	{
+		jobApplicationGroup.POST("/", controllers.CreateJobApplicationHandler) // Create a new job application
+		jobApplicationGroup.DELETE("/:id", controllers.DeleteJobApplicationHandler)
+		jobApplicationGroup.PUT("/applications/:id/status", controllers.HandleJobApplicationStatus) // Delete a job application by ID
 	}
 
 	return router

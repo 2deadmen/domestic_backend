@@ -29,7 +29,7 @@ type Employee struct {
 	AddressProof   string    `json:"addressproof"`
 	OpenToWork     bool      `json:"opentowork"`
 	WorkExperience string    `json:"workexperience"`
-	TypeOfWork     []string  `json:"typeofwork" gorm:"type:text[]"`
+	TypeOfWork     string    `json:"typeofwork"`
 	PhotoURL       string    `json:"photourl"`
 	Verified       bool      `json:"verified" gorm:"default:false"`
 	CreatedAt      time.Time `json:"created_at"`
@@ -41,7 +41,7 @@ type JobCard struct {
 	Pincode                 int       `json:"pincode"`
 	Location                string    `json:"location"`
 	Gender                  string    `json:"gender"`
-	JobType                 []string  `json:"jobType" gorm:"type:text[]"`
+	JobType                 string    `json:"jobType" `
 	Salary                  string    `json:"salary"`
 	Duration                string    `json:"duration"`
 	ExperienceReq           string    `json:"experienceReq"`
