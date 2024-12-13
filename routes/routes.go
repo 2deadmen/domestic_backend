@@ -19,18 +19,12 @@ import (
 func InitRoutes() *gin.Engine {
 	router := gin.Default()
 	// Use CORS middleware with permissive configuration
+
 	router.Use(cors.New(cors.Config{
-		AllowAllOrigins:  true,                                                // Allow all origins
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}, // Allow all methods
-		AllowHeaders:     []string{"*"},                                       // Allow all headers
-		AllowCredentials: true,                                                // Allow cookies and credentials
+		AllowOrigins: []string{"http://localhost:3000"},                   // Explicitly allow your frontend origin
+		AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}, // Allow all methods
+		AllowHeaders: []string{"*"},                                       // Allow all headers
 	}))
-
-	// Define routes
-	router.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{"message": "pong"})
-	})
-
 	// Migrate the database models to the database
 	models.MigrateModels()
 
