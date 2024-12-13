@@ -4,6 +4,7 @@ import (
 	"github.com/2deadmen/domestic_backend/controllers"
 	_ "github.com/2deadmen/domestic_backend/docs" // Import the generated docs
 	"github.com/2deadmen/domestic_backend/models"
+	"github.com/gin-contrib/cors"
 
 	// "github.com/2deadmen/domestic_backend/middlewares"
 	"github.com/gin-gonic/gin"
@@ -17,6 +18,18 @@ import (
 // @Tags Routes
 func InitRoutes() *gin.Engine {
 	router := gin.Default()
+	// Use CORS middleware with permissive configuration
+	router.Use(cors.New(cors.Config{
+		AllowAllOrigins:  true,                                                // Allow all origins
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}, // Allow all methods
+		AllowHeaders:     []string{"*"},                                       // Allow all headers
+		AllowCredentials: true,                                                // Allow cookies and credentials
+	}))
+
+	// Define routes
+	router.GET("/ping", func(c *gin.Context) {
+		c.JSON(200, gin.H{"message": "pong"})
+	})
 
 	// Migrate the database models to the database
 	models.MigrateModels()
