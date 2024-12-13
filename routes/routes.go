@@ -4,7 +4,6 @@ import (
 	"github.com/2deadmen/domestic_backend/controllers"
 	_ "github.com/2deadmen/domestic_backend/docs" // Import the generated docs
 	"github.com/2deadmen/domestic_backend/models"
-	"github.com/gin-contrib/cors"
 
 	// "github.com/2deadmen/domestic_backend/middlewares"
 	"github.com/gin-gonic/gin"
@@ -16,15 +15,43 @@ import (
 // @Summary Initialize API routes
 // @Description Sets up all the API routes, including Swagger documentation and user endpoints
 // @Tags Routes
+
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Allow a specific origin
+		c.Header("Access-Control-Allow-Origin", "http://localhost:3000") // Frontend origin
+
+		// Allow credentials (cookies, HTTP authentication, etc.)
+		c.Header("Access-Control-Allow-Credentials", "true")
+
+		// Allow specific headers
+		c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+
+		// Allow specific HTTP methods
+		c.Header("Access-Control-Allow-Methods", "POST, HEAD, PATCH, OPTIONS, GET, PUT")
+
+		// For preflight requests (OPTIONS), respond with 204 No Content
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		// Handle redirects (ensure CORS headers are added)
+		if c.Request.Method == "GET" && c.Request.URL.Path == "http://localhost:8080" {
+			c.Header("Access-Control-Allow-Origin", "http://localhost:3000")
+			c.Header("Access-Control-Allow-Credentials", "true")
+		}
+
+		// Proceed with the request
+		c.Next()
+	}
+}
+
 func InitRoutes() *gin.Engine {
 	router := gin.Default()
 	// Use CORS middleware with permissive configuration
+	router.Use(CORSMiddleware())
 
-	router.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"http://localhost:3000"},                   // Explicitly allow your frontend origin
-		AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}, // Allow all methods
-		AllowHeaders: []string{"*"},                                       // Allow all headers
-	}))
 	// Migrate the database models to the database
 	models.MigrateModels()
 
