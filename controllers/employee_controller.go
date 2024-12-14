@@ -69,6 +69,7 @@ func CreateEmployee(c *gin.Context) {
 	utils.RespondJSON(c, http.StatusCreated, gin.H{
 		"message": "Employee created successfully",
 		"phone":   employee.Phone,
+		"id":      employee.ID,
 		"token":   token,
 	})
 }
