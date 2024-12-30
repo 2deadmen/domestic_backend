@@ -60,3 +60,24 @@ type JobApplication struct {
 	JobId      int    `json:"jobId" gorm:"foreignKey"`
 	Status     string `json:"status"  gorm:"default:'accepted'"` // "accepted" or "rejected"
 }
+
+type JobCampaign struct {
+	ID          uint      `json:"id" gorm:"primaryKey"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	Location    string    `json:"location"`
+	StartDate   time.Time `json:"start_date"`
+	EndDate     time.Time `json:"end_date"`
+	Active      bool      `json:"active" gorm:"default:true"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+type CampaignApplication struct {
+	ID            uint      `json:"id" gorm:"primaryKey"`
+	EmployeeID    uint      `json:"employee_id" gorm:"foreignKey"`
+	JobCampaignID uint      `json:"job_campaign_id" gorm:"foreignKey"`
+	Status        string    `json:"status" gorm:"default:'pending'"` // "pending", "accepted", "rejected"
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
+}

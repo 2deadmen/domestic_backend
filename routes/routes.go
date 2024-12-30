@@ -335,5 +335,27 @@ func InitRoutes() *gin.Engine {
 		jobApplicationGroup.PUT("/applications/:id/status", controllers.HandleJobApplicationStatus) // Delete a job application by ID
 	}
 
+	r := gin.Default()
+
+	campaignGroup := r.Group("/campaigns")
+	{
+		// Routes for managing job campaigns
+		campaignGroup.POST("/", controllers.CreateJobCampaignController)          // Create new campaign
+		campaignGroup.GET("/", controllers.GetAllJobCampaignsController)          // Get all campaigns
+		campaignGroup.GET("/active", controllers.GetActiveJobCampaignsController) // Get active campaigns
+		campaignGroup.GET("/:id", controllers.GetJobCampaignByIDController)       // Get a specific campaign by ID
+		campaignGroup.PUT("/:id", controllers.UpdateJobCampaignController)        // Update a specific campaign
+		campaignGroup.DELETE("/:id", controllers.DeleteJobCampaignController)     // Delete a specific campaign
+	}
+
+	applicationGroup := r.Group("/applications")
+	{
+		// Routes for managing campaign applications
+		applicationGroup.POST("/", controllers.CreateCampaignApplicationController)                       // Apply for a campaign
+		applicationGroup.GET("/campaign/:campaign_id", controllers.GetApplicationsByCampaignIDController) // Get applications for a campaign
+		applicationGroup.PUT("/:id", controllers.UpdateApplicationStatusController)                       // Update application status (e.g., accepted, rejected)
+		applicationGroup.DELETE("/:id", controllers.DeleteCampaignApplicationController)                  // Delete an application
+	}
+
 	return router
 }
