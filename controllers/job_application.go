@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -47,11 +48,38 @@ func HandleJobApplicationStatus(c *gin.Context) {
 func CreateJobApplicationHandler(c *gin.Context) {
 	var jobApplication models.JobApplication
 
+	// Bind the request body to the job application model
 	if err := c.ShouldBindJSON(&jobApplication); err != nil {
 		utils.RespondJSON(c, http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return
 	}
 
+	// Fetch employer details from the Employer table
+	employer, err := models.GetEmployerByID(strconv.Itoa(jobApplication.EmployerId))
+	if err != nil {
+		utils.RespondJSON(c, http.StatusNotFound, gin.H{"error": "Employer not found"})
+		return
+	}
+
+	// Fetch employee details from the Employee table
+	employee, err := models.GetEmployeeByID(strconv.Itoa(jobApplication.EmployeeId))
+	if err != nil {
+		utils.RespondJSON(c, http.StatusNotFound, gin.H{"error": "Employee not found"})
+		return
+	}
+
+	// Send email to the employer with job application details
+	emailContent := fmt.Sprintf(
+		"New Job Application:\n\nEmployee Name: %s: %s%s%s%s\nEmployee Phone: %s\n\nPlease review the application.",
+		employee.Name, employee.Gender, employee.TypeOfWork, employee.Phone, employee.CreatedAt, employee.WorkExperience,
+	)
+
+	if err := utils.SendEmail(employer.Email, "New Job Application", emailContent); err != nil {
+		utils.RespondJSON(c, http.StatusInternalServerError, gin.H{"error": "Failed to send email to employer"})
+		return
+	}
+
+	// Create the job application record in the database
 	if err := models.CreateJobApplication(&jobApplication); err != nil {
 		utils.RespondJSON(c, http.StatusInternalServerError, gin.H{"error": "Failed to create job application"})
 		return

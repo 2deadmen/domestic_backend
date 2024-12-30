@@ -180,7 +180,7 @@ func InitRoutes() *gin.Engine {
 		// @Failure 400 {object} map[string]string
 		// @Failure 500 {object} map[string]string
 		// @Router /employees [post]
-		employeeRoutes.POST("", controllers.CreateEmployee)
+		employeeRoutes.POST("/", controllers.CreateEmployee)
 
 		// @Summary Sign in an employee
 		// @Description Log in an employee with phone and pin
@@ -202,7 +202,7 @@ func InitRoutes() *gin.Engine {
 		// @Success 200 {array} models.Employee
 		// @Failure 500 {object} map[string]string
 		// @Router /employees [get]
-		employeeRoutes.GET("", controllers.GetAllEmployees)
+		employeeRoutes.GET("/", controllers.GetAllEmployees)
 
 		// @Summary Get an employee by ID
 		// @Description Retrieve an employee's details
@@ -213,7 +213,7 @@ func InitRoutes() *gin.Engine {
 		// @Failure 404 {object} map[string]string
 		// @Failure 500 {object} map[string]string
 		// @Router /employees/{id} [get]
-		employeeRoutes.GET(":id", controllers.GetEmployee)
+		employeeRoutes.GET("/:id", controllers.GetEmployee)
 
 		// @Summary Update an employee
 		// @Description Modify an employee's details
@@ -227,7 +227,7 @@ func InitRoutes() *gin.Engine {
 		// @Failure 404 {object} map[string]string
 		// @Failure 500 {object} map[string]string
 		// @Router /employees/{id} [put]
-		employeeRoutes.PUT(":id", controllers.UpdateEmployee)
+		employeeRoutes.PUT("/:id", controllers.UpdateEmployee)
 
 		// @Summary Delete an employee
 		// @Description Remove an employee by ID
@@ -238,7 +238,7 @@ func InitRoutes() *gin.Engine {
 		// @Failure 404 {object} map[string]string
 		// @Failure 500 {object} map[string]string
 		// @Router /employees/{id} [delete]
-		employeeRoutes.DELETE(":id", controllers.DeleteEmployee)
+		employeeRoutes.DELETE("/:id", controllers.DeleteEmployee)
 	}
 
 	//    --------------------------------------------------------------------------------------------------------------------------------
@@ -256,7 +256,7 @@ func InitRoutes() *gin.Engine {
 		// @Failure 400 {object} map[string]string
 		// @Failure 500 {object} map[string]string
 		// @Router /jobcards [post]
-		jobCardRoutes.POST("", controllers.CreateJobCard)
+		jobCardRoutes.POST("/", controllers.CreateJobCard)
 
 		// @Summary Get all job cards
 		// @Description Retrieve a list of all job cards
@@ -265,7 +265,7 @@ func InitRoutes() *gin.Engine {
 		// @Success 200 {array} JobCard
 		// @Failure 500 {object} map[string]string
 		// @Router /jobcards [get]
-		jobCardRoutes.GET("", controllers.GetAllJobCards)
+		jobCardRoutes.GET("/", controllers.GetAllJobCards)
 
 		// @Summary Get a job card by ID
 		// @Description Retrieve a job card's details
@@ -276,7 +276,7 @@ func InitRoutes() *gin.Engine {
 		// @Failure 404 {object} map[string]string
 		// @Failure 500 {object} map[string]string
 		// @Router /jobcards/{id} [get]
-		jobCardRoutes.GET(":id", controllers.GetJobCard)
+		jobCardRoutes.GET("/:id", controllers.GetJobCard)
 
 		// @Summary Update a job card
 		// @Description Modify a job card's details
@@ -290,7 +290,7 @@ func InitRoutes() *gin.Engine {
 		// @Failure 404 {object} map[string]string
 		// @Failure 500 {object} map[string]string
 		// @Router /jobcards/{id} [put]
-		jobCardRoutes.PUT(":id", controllers.UpdateJobCard)
+		jobCardRoutes.PUT("/:id", controllers.UpdateJobCard)
 
 		// @Summary Delete a job card
 		// @Description Remove a job card by ID
@@ -301,7 +301,7 @@ func InitRoutes() *gin.Engine {
 		// @Failure 404 {object} map[string]string
 		// @Failure 500 {object} map[string]string
 		// @Router /jobcards/{id} [delete]
-		jobCardRoutes.DELETE(":id", controllers.DeleteJobCard)
+		jobCardRoutes.DELETE("/:id", controllers.DeleteJobCard)
 
 		// @Summary Get active job cards
 		// @Description Retrieve all active job cards
@@ -324,7 +324,7 @@ func InitRoutes() *gin.Engine {
 		// @Failure 404 {object} map[string]string
 		// @Failure 500 {object} map[string]string
 		// @Router /jobcards/{id}/active [put]
-		jobCardRoutes.PUT(":id/active", controllers.UpdateJobCardActiveStatus)
+		jobCardRoutes.PUT("/:id/active", controllers.UpdateJobCardActiveStatus)
 
 	}
 
