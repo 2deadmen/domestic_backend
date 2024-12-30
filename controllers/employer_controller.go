@@ -68,16 +68,14 @@ func CreateEmployer(c *gin.Context) {
 		utils.RespondJSON(c, http.StatusInternalServerError, gin.H{"error": "Unable to create employer"})
 		return
 	}
-	token, err := utils.GenerateJWT(employer.ID, employer.Email)
-	if err != nil {
-		utils.RespondJSON(c, http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
-		return
-	}
+	// token, err := utils.GenerateJWT(employer.ID, employer.Email)
+	// if err != nil {
+	// 	utils.RespondJSON(c, http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+	// 	return
+	// }
 
 	utils.RespondJSON(c, http.StatusCreated, gin.H{
 		"message": "Employer created successfully. OTP has been sent to your email.",
-		"id":      employer.ID,
-		"token":   token,
 	})
 
 }
