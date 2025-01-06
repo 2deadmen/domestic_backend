@@ -19,7 +19,7 @@ import (
 func CORSMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Allow a specific origin
-		c.Header("Access-Control-Allow-Origin", "http://localhost:3000") // Frontend origin
+		c.Header("Access-Control-Allow-Origin", "http://localhost:5173") // Frontend origin
 
 		// Allow credentials (cookies, HTTP authentication, etc.)
 		c.Header("Access-Control-Allow-Credentials", "true")
@@ -38,7 +38,7 @@ func CORSMiddleware() gin.HandlerFunc {
 
 		// Handle redirects (ensure CORS headers are added)
 		if c.Request.Method == "GET" && c.Request.URL.Path == "http://localhost:8080" {
-			c.Header("Access-Control-Allow-Origin", "http://localhost:3000")
+			c.Header("Access-Control-Allow-Origin", "http://localhost:5173")
 			c.Header("Access-Control-Allow-Credentials", "true")
 		}
 

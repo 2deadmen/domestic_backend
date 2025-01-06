@@ -14,7 +14,7 @@ type Employer struct {
 	Phone        string    `json:"phone" `
 	AddressProof string    `json:"addressproof"`
 	Type         string    `json:"type"`
-	OTP          string    `json:"otp"`
+	OTP          string    `json:"otp" gorm:"default: "`
 	Verified     bool      `json:"verified" gorm:"default:true"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
