@@ -28,7 +28,7 @@ func CORSMiddleware() gin.HandlerFunc {
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
 
 		// Allow specific HTTP methods
-		c.Header("Access-Control-Allow-Methods", "POST, HEAD, PATCH, OPTIONS, GET, PUT")
+		c.Header("Access-Control-Allow-Methods", "POST, HEAD, PATCH, OPTIONS,DELETE, GET, PUT")
 
 		// For preflight requests (OPTIONS), respond with 204 No Content
 		if c.Request.Method == "OPTIONS" {
@@ -110,7 +110,7 @@ func InitRoutes() *gin.Engine {
 		// @Produce json
 		// @Param credentials body models.SignInRequest true "Sign In Credentials"
 		// @Success 200 {object} map[string]interface{}
-		// @Failure 400 {object} map[string]string
+		// @Failure 400 	{object} map[string]string
 		// @Failure 401 {object} map[string]string
 		// @Failure 500 {object} map[string]string
 		// @Router /employers/sign-in [post]
@@ -330,6 +330,8 @@ func InitRoutes() *gin.Engine {
 
 	jobApplicationGroup := router.Group("/job-applications")
 	{
+		jobApplicationGroup.GET("/", controllers.GetApplicationsByEmployerOrEmployeeHandler)
+
 		jobApplicationGroup.POST("/", controllers.CreateJobApplicationHandler) // Create a new job application
 		jobApplicationGroup.DELETE("/:id", controllers.DeleteJobApplicationHandler)
 		jobApplicationGroup.PUT("/applications/:id/status", controllers.HandleJobApplicationStatus) // Delete a job application by ID

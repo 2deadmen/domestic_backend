@@ -32,3 +32,19 @@ func DeleteJobApplication(id int) error {
 	}
 	return nil
 }
+
+func GetApplicationsByEmployer(employerId string) ([]JobApplication, error) {
+	var applications []JobApplication
+	if err := services.DB.Where("employer_id = ?", employerId).Find(&applications).Error; err != nil {
+		return nil, errors.Wrap(err, "failed to fetch applications by employer")
+	}
+	return applications, nil
+}
+
+func GetApplicationsByEmployee(employeeId string) ([]JobApplication, error) {
+	var applications []JobApplication
+	if err := services.DB.Where("employee_id = ?", employeeId).Find(&applications).Error; err != nil {
+		return nil, errors.Wrap(err, "failed to fetch applications by employee")
+	}
+	return applications, nil
+}

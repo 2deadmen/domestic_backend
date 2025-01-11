@@ -103,3 +103,27 @@ func DeleteJobApplicationHandler(c *gin.Context) {
 
 	utils.RespondJSON(c, http.StatusOK, gin.H{"message": "Job application deleted successfully"})
 }
+
+func GetApplicationsByEmployerOrEmployeeHandler(c *gin.Context) {
+	userType := c.Query("userType")
+	userId := c.Query("userId")
+
+	var applications []models.JobApplication
+	var err error
+
+	if userType == "Employer" {
+		applications, err = models.GetApplicationsByEmployer(userId)
+	} else if userType == "Employee" {
+		applications, err = models.GetApplicationsByEmployee(userId)
+	} else {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user type"})
+		return
+	}
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching applications"})
+		return
+	}
+
+	c.JSON(http.StatusOK, applications)
+}
