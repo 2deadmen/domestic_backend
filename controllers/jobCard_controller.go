@@ -44,6 +44,7 @@ func GetJobCard(c *gin.Context) {
 		utils.RespondJSON(c, http.StatusBadRequest, gin.H{"error": "Invalid job card ID"})
 		return
 	}
+	//new
 
 	jobCard, err := models.GetJobCardByID(id)
 	if err != nil {
