@@ -334,7 +334,12 @@ func InitRoutes() *gin.Engine {
 
 		jobApplicationGroup.POST("/", controllers.CreateJobApplicationHandler) // Create a new job application
 		jobApplicationGroup.DELETE("/:id", controllers.DeleteJobApplicationHandler)
-		jobApplicationGroup.PUT("/applications/:id/status", controllers.HandleJobApplicationStatus) // Delete a job application by ID
+		jobApplicationGroup.PUT("/applications/:id/status", controllers.HandleJobApplicationStatus)
+
+		// ratings and comments
+		jobApplicationGroup.POST("/:id/rating", controllers.AddRatingHandler)                              // Add rating and comment
+		jobApplicationGroup.GET("/employee/:employeeId/ratings", controllers.GetRatingsForEmployeeHandler) // Fetch ratings for an employee
+
 	}
 
 	r := gin.Default()

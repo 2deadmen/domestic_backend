@@ -127,3 +127,63 @@ func GetApplicationsByEmployerOrEmployeeHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, applications)
 }
+
+// ratings and comments
+// AddRatingHandler handles adding a rating and comment for a job application
+func AddRatingHandler(c *gin.Context) {
+	var input struct {
+		Rating  int    `json:"rating" binding:"required,min=1,max=5"`
+		Comment string `json:"comment"`
+	}
+
+	jobApplicationID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		utils.RespondJSON(c, http.StatusBadRequest, gin.H{"error": "Invalid job application ID"})
+		return
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		utils.RespondJSON(c, http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Check if the job application exists
+	jobApplication, err := models.GetJobApplicationByID(jobApplicationID)
+	if err != nil {
+		utils.RespondJSON(c, http.StatusNotFound, gin.H{"error": "Job application not found"})
+		return
+	}
+
+	// Create a new rating
+	newRating := models.Rating{
+		JobApplicationID: uint(jobApplicationID),
+		EmployerID:       uint(jobApplication.EmployerId),
+		EmployeeID:       uint(jobApplication.EmployeeId),
+		Rating:           input.Rating,
+		Comment:          input.Comment,
+	}
+
+	if err := models.CreateRating(&newRating); err != nil {
+		utils.RespondJSON(c, http.StatusInternalServerError, gin.H{"error": "Failed to create rating"})
+		return
+	}
+
+	utils.RespondJSON(c, http.StatusCreated, gin.H{"message": "Rating added successfully", "data": newRating})
+}
+
+// GetRatingsForEmployeeHandler retrieves all ratings and comments for a specific employee
+func GetRatingsForEmployeeHandler(c *gin.Context) {
+	employeeID, err := strconv.Atoi(c.Param("employeeId"))
+	if err != nil {
+		utils.RespondJSON(c, http.StatusBadRequest, gin.H{"error": "Invalid employee ID"})
+		return
+	}
+
+	ratings, err := models.GetRatingsByEmployee(uint(employeeID))
+	if err != nil {
+		utils.RespondJSON(c, http.StatusInternalServerError, gin.H{"error": "Failed to fetch ratings"})
+		return
+	}
+
+	utils.RespondJSON(c, http.StatusOK, gin.H{"data": ratings})
+}

@@ -16,7 +16,7 @@ func MigrateModels() {
 	log.Println("Starting database migrations...")
 
 	// Perform auto-migration for all models
-	err := services.DB.AutoMigrate(&Employee{}, &Employer{}, &JobApplication{}, &JobCard{}, &JobCampaign{}, &CampaignApplication{})
+	err := services.DB.AutoMigrate(&Employee{}, &Employer{}, &Rating{}, &JobApplication{}, &JobCard{}, &JobCampaign{}, &CampaignApplication{})
 	if err != nil {
 		log.Fatalf("Failed to migrate database models: %v", err)
 	}

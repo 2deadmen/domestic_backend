@@ -81,3 +81,14 @@ type CampaignApplication struct {
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
 }
+
+type Rating struct {
+	ID               uint      `json:"id" gorm:"primaryKey"`
+	JobApplicationID uint      `json:"job_application_id" gorm:"foreignKey"`
+	EmployeeID       uint      `json:"employee_id" gorm:"foreignKey"`
+	EmployerID       uint      `json:"employer_id" gorm:"foreignKey"`
+	Rating           int       `json:"rating" binding:"required,min=1,max=5"` // Stars (1-5)
+	Comment          string    `json:"comment"`                               // Optional comment
+	CreatedAt        time.Time `json:"created_at"`
+	UpdatedAt        time.Time `json:"updated_at"`
+}
