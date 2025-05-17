@@ -1,10 +1,20 @@
 package controllers
 
 import (
+	"bytes"
+	"fmt"
 	"net/http"
 
 	"github.com/2deadmen/domestic_backend/models"
+	"github.com/2deadmen/domestic_backend/services"
 	"github.com/2deadmen/domestic_backend/utils"
+
+	"encoding/csv"
+	"encoding/json"
+	"io"
+	"os"
+	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -227,4 +237,161 @@ func DeleteEmployee(c *gin.Context) {
 	}
 
 	utils.RespondJSON(c, http.StatusOK, gin.H{"message": "Employee deleted successfully"})
+}
+
+func ExportEmployeeDataToCSV(c *gin.Context) {
+	db := services.DB
+
+	var employees []models.Employee
+	if err := db.Find(&employees).Error; err != nil {
+		c.JSON(500, gin.H{"error": "Failed to fetch employees"})
+		return
+	}
+
+	file, err := os.Create("employee_data.csv")
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to create CSV file"})
+		return
+	}
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	// Header
+	writer.Write([]string{"age", "gender", "experience", "applications_accepted", "applications_rejected", "ratings_avg", "dropout_percentage"})
+
+	for _, emp := range employees {
+		// 1. Age
+		age := emp.Age
+
+		// 2. Gender (binary)
+		gender := 0
+		if strings.ToLower(emp.Gender) == "male" {
+			gender = 1
+		}
+
+		// 3. Experience (extract first int from WorkExperience)
+		expStr := strings.Fields(emp.WorkExperience)
+		experience := 0
+		if len(expStr) > 0 {
+			if e, err := strconv.Atoi(expStr[0]); err == nil {
+				experience = e
+			}
+		}
+
+		// 4. Applications accepted
+		var acceptedCount int64
+		db.Model(&models.JobApplication{}).
+			Where("employee_id = ? AND status = ?", emp.ID, "accepted").
+			Count(&acceptedCount)
+
+		// 5. Applications rejected
+		var rejectedCount int64
+		db.Model(&models.JobApplication{}).
+			Where("employee_id = ? AND status = ?", emp.ID, "rejected").
+			Count(&rejectedCount)
+
+		// 6. Average rating
+		var avgRating float64
+		db.Model(&models.Rating{}).
+			Where("employee_id = ?", emp.ID).
+			Select("AVG(rating)").Scan(&avgRating)
+
+		dropoutPercentage := 100 - (float64(acceptedCount)*20 + avgRating*10 + float64(experience)*5)
+		if dropoutPercentage < 0 {
+			dropoutPercentage = 0
+		}
+
+		// Write to CSV
+		row := []string{
+			strconv.Itoa(age),
+			strconv.Itoa(gender),
+			strconv.Itoa(experience),
+			strconv.FormatInt(acceptedCount, 10),
+			strconv.FormatInt(rejectedCount, 10),
+			fmt.Sprintf("%.2f", avgRating),
+			fmt.Sprintf("%.2f", dropoutPercentage),
+		}
+		writer.Write(row)
+	}
+
+	c.JSON(200, gin.H{"message": "CSV export successful"})
+}
+
+func PredictEmployeeDropout(c *gin.Context) {
+	employeeID := c.Param("id")
+	db := services.DB
+
+	// Fetch employee
+	var emp models.Employee
+	if err := db.First(&emp, employeeID).Error; err != nil {
+		c.JSON(404, gin.H{"error": "Employee not found"})
+		return
+	}
+
+	// Parse fields
+	age := emp.Age
+	gender := 0
+	if strings.ToLower(emp.Gender) == "male" {
+		gender = 1
+	}
+
+	// Extract numeric experience
+	exp := 0
+	if fields := strings.Fields(emp.WorkExperience); len(fields) > 0 {
+		if e, err := strconv.Atoi(fields[0]); err == nil {
+			exp = e
+		}
+	}
+
+	var accepted, rejected int64
+	db.Model(&models.JobApplication{}).Where("employee_id = ? AND status = ?", emp.ID, "accepted").Count(&accepted)
+	db.Model(&models.JobApplication{}).Where("employee_id = ? AND status = ?", emp.ID, "rejected").Count(&rejected)
+
+	var avgRating float64
+	db.Model(&models.Rating{}).Where("employee_id = ?", emp.ID).Select("AVG(rating)").Scan(&avgRating)
+
+	// Build request body
+	requestBody := map[string]interface{}{
+		"age":                   age,
+		"gender":                gender,
+		"experience":            exp,
+		"applications_accepted": accepted,
+		"applications_rejected": rejected,
+		"ratings_avg":           avgRating,
+	}
+
+	jsonData, err := json.Marshal(requestBody)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to marshal request"})
+		return
+	}
+
+	// Call Flask API
+	resp, err := http.Post("http://localhost:5000/predict", "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to reach ML service"})
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to read response from ML service"})
+		return
+	}
+
+	// Parse response
+	var result map[string]interface{}
+	if err := json.Unmarshal(body, &result); err != nil {
+		c.JSON(500, gin.H{"error": "Invalid response from ML service"})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"employee_id":         emp.ID,
+		"dropout_percentage":  result["dropout_percentage"],
+		"prediction_features": requestBody,
+	})
 }

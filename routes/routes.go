@@ -342,9 +342,9 @@ func InitRoutes() *gin.Engine {
 
 	}
 
-	r := gin.Default()
+	//model related
 
-	campaignGroup := r.Group("/campaigns")
+	campaignGroup := router.Group("/campaigns")
 	{
 		// Routes for managing job campaigns
 		campaignGroup.POST("/", controllers.CreateJobCampaignController)          // Create new campaign
@@ -354,8 +354,16 @@ func InitRoutes() *gin.Engine {
 		campaignGroup.PUT("/:id", controllers.UpdateJobCampaignController)        // Update a specific campaign
 		campaignGroup.DELETE("/:id", controllers.DeleteJobCampaignController)     // Delete a specific campaign
 	}
+	modelGroup := router.Group("/api")
+	{
+		// Routes for managing job campaigns
+		modelGroup.GET("/export-csv", controllers.ExportEmployeeDataToCSV) // Create new campaign
+		modelGroup.GET("/predict-dropout/:id", controllers.PredictEmployeeDropout)
 
-	applicationGroup := r.Group("/applications")
+		//         // Get all campaigns
+	}
+
+	applicationGroup := router.Group("/applications")
 	{
 		// Routes for managing campaign applications
 		applicationGroup.POST("/", controllers.CreateCampaignApplicationController)                       // Apply for a campaign
