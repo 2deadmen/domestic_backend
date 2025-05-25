@@ -1,19 +1,72 @@
 definitions:
-  models.User:
+  models.Employee:
     properties:
-      email:
+      addressproof:
+        type: string
+      age:
+        type: integer
+      created_at:
+        type: string
+      gender:
         type: string
       id:
         type: integer
       name:
         type: string
+      opentowork:
+        type: boolean
+      phone:
+        type: string
+      photourl:
+        type: string
+      pin:
+        type: string
+      typeofwork:
+        items:
+          type: string
+        type: array
+      updated_at:
+        type: string
+      verified:
+        type: boolean
+      workexperience:
+        type: string
+    type: object
+  models.Employer:
+    properties:
+      addressproof:
+        type: string
+      age:
+        type: integer
+      created_at:
+        type: string
+      email:
+        type: string
+      gender:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      otp:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+      verified:
+        type: boolean
     type: object
 info:
   contact: {}
 paths:
-  /users:
+  /employees:
     get:
-      description: Fetch all users from the database
+      description: Retrieve a list of all employees
       produces:
       - application/json
       responses:
@@ -21,7 +74,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.User'
+              $ref: '#/definitions/models.Employee'
             type: array
         "500":
           description: Internal Server Error
@@ -29,27 +82,241 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: Get all users
+      summary: Get all employees
       tags:
-      - Users
+      - Employees
     post:
       consumes:
       - application/json
-      description: Add a new user to the database
+      description: Sign up a new employee
       parameters:
-      - description: User Data
+      - description: Employee Data
         in: body
-        name: user
+        name: employee
         required: true
         schema:
-          $ref: '#/definitions/models.User'
+          $ref: '#/definitions/models.Employee'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.User'
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register a new employee
+      tags:
+      - Employees
+  /employees/{id}:
+    delete:
+      description: Remove an employee by ID
+      parameters:
+      - description: Employee ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete an employee
+      tags:
+      - Employees
+    get:
+      description: Retrieve an employee's details
+      parameters:
+      - description: Employee ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Employee'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get an employee by ID
+      tags:
+      - Employees
+    put:
+      consumes:
+      - application/json
+      description: Modify an employee's details
+      parameters:
+      - description: Employee ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated Employee Data
+        in: body
+        name: employee
+        required: true
+        schema:
+          $ref: '#/definitions/models.Employee'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update an employee
+      tags:
+      - Employees
+  /employees/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Log in an employee with phone and pin
+      parameters:
+      - description: Phone and Pin
+        in: body
+        name: credentials
+        required: true
+        schema:
+          additionalProperties:
+            type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Sign in an employee
+      tags:
+      - Employees
+  /employers:
+    get:
+      description: Retrieve a list of all employers
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Employer'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all employers
+      tags:
+      - Employers
+    post:
+      consumes:
+      - application/json
+      description: Sign up a new employer with email and password
+      parameters:
+      - description: Employer Data
+        in: body
+        name: employer
+        required: true
+        schema:
+          $ref: '#/definitions/models.Employer'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -62,7 +329,202 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: Create a new user
+      summary: Register a new employer
       tags:
-      - Users
+      - Employers
+  /employers/{id}:
+    delete:
+      description: Remove an employer by ID
+      parameters:
+      - description: Employer ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete an employer
+      tags:
+      - Employers
+    get:
+      description: Retrieve an employer's details
+      parameters:
+      - description: Employer ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Employer'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get an employer by ID
+      tags:
+      - Employers
+    put:
+      consumes:
+      - application/json
+      description: Modify an employer's details
+      parameters:
+      - description: Employer ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated Employer Data
+        in: body
+        name: employer
+        required: true
+        schema:
+          $ref: '#/definitions/models.Employer'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update an employer
+      tags:
+      - Employers
+  /employers/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Log in an employer with email and password
+      parameters:
+      - description: Email and Password
+        in: body
+        name: credentials
+        required: true
+        schema:
+          additionalProperties:
+            type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Sign in an employer
+      tags:
+      - Employers
+  /employers/verify-otp:
+    post:
+      consumes:
+      - application/json
+      description: Verify OTP for an employer and mark as verified
+      parameters:
+      - description: OTP and Email
+        in: body
+        name: otp
+        required: true
+        schema:
+          additionalProperties:
+            type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Verify an employer's OTP
+      tags:
+      - Employers
 swagger: "2.0"

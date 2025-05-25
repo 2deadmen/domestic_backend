@@ -15,8 +15,42 @@ import (
 // @Summary Initialize API routes
 // @Description Sets up all the API routes, including Swagger documentation and user endpoints
 // @Tags Routes
+
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Allow a specific origin
+		c.Header("Access-Control-Allow-Origin", "http://localhost:5173") // Frontend origin
+
+		// Allow credentials (cookies, HTTP authentication, etc.)
+		c.Header("Access-Control-Allow-Credentials", "true")
+
+		// Allow specific headers
+		c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+
+		// Allow specific HTTP methods
+		c.Header("Access-Control-Allow-Methods", "POST, HEAD, PATCH, OPTIONS,DELETE, GET, PUT")
+
+		// For preflight requests (OPTIONS), respond with 204 No Content
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		// Handle redirects (ensure CORS headers are added)
+		if c.Request.Method == "GET" && c.Request.URL.Path == "http://localhost:8080" {
+			c.Header("Access-Control-Allow-Origin", "http://localhost:5173")
+			c.Header("Access-Control-Allow-Credentials", "true")
+		}
+
+		// Proceed with the request
+		c.Next()
+	}
+}
+
 func InitRoutes() *gin.Engine {
 	router := gin.Default()
+	// Use CORS middleware with permissive configuration
+	router.Use(CORSMiddleware())
 
 	// Migrate the database models to the database
 	models.MigrateModels()
@@ -29,24 +63,313 @@ func InitRoutes() *gin.Engine {
 	// @Tags Documentation
 	// @Router /swagger/*any [get]
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(files.Handler))
-	// router.Use(middlewares.JWTMiddleware())
-	// User routes
-	userGroup := router.Group("/users")
-	{
-		// @Summary Get all users
-		// @Description Retrieve a list of all users
-		// @Tags Users
-		// @Produce json
-		// @Router /users [get]
-		userGroup.GET("/", controllers.GetUsers)
 
-		// @Summary Create a new user
-		// @Description Add a new user to the system
-		// @Tags Users
+	// router.Use(middlewares.JWTMiddleware())
+
+	//testing to be done with jwt tokens and all other unit tests are to be done
+	//
+	//
+	//
+	//
+
+	// Employer routes
+	employerGroup := router.Group("/employers")
+	{
+		// @Summary Register a new employer
+		// @Description Add a new employer with email and password
+		// @Tags Employers
 		// @Accept json
 		// @Produce json
-		// @Router /users [post]
-		userGroup.POST("/", controllers.CreateUser)
+		// @Param employer body models.Employer true "Employer Data"
+		// @Success 201 {object} map[string]interface{}
+		// @Failure 400 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /employers [post]
+
+		employerGroup.POST("/", controllers.CreateEmployer)
+
+		// VerifyOTP godoc
+		// @Summary Verify OTP for an employer
+		// @Description Validate the OTP sent to the employer's email and activate the account
+		// @Tags Employers
+		// @Accept json
+		// @Produce json
+		// @Param otp body models.VerifyOTPRequest true "OTP Verification Data"
+		// @Success 200 {object} map[string]interface{}
+		// @Failure 400 {object} map[string]string
+		// @Failure 404 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /employers/verify-otp [post]
+		employerGroup.POST("/verify-otp", controllers.VerifyOTP)
+
+		// SignIn godoc
+		// @Summary Sign in an employer
+		// @Description Authenticate an employer using email and password, and return a JWT
+		// @Tags Employers
+		// @Accept json
+		// @Produce json
+		// @Param credentials body models.SignInRequest true "Sign In Credentials"
+		// @Success 200 {object} map[string]interface{}
+		// @Failure 400 	{object} map[string]string
+		// @Failure 401 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /employers/sign-in [post]
+		employerGroup.POST("/sign-in", controllers.SignIn)
+
+		// GetAllEmployers godoc
+		// @Summary Get all employers
+		// @Description Retrieve a list of all employers
+		// @Tags Employers
+		// @Produce json
+		// @Success 200 {array} models.Employer
+		// @Failure 500 {object} map[string]string
+		// @Router /employers [get]
+		employerGroup.GET("/", controllers.GetAllEmployers)
+
+		// @Summary Get an employer by ID
+		// @Description Retrieve an employer's details using their ID
+		// @Tags Employers
+		// @Produce json
+		// @Param id path int true "Employer ID"
+		// @Success 200 {object} models.Employer
+		// @Failure 404 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /employers/{id} [get]
+
+		employerGroup.GET("/:id", controllers.GetEmployer)
+
+		// @Summary Update an employer by ID
+		// @Description Modify an employer's details using their ID
+		// @Tags Employers
+		// @Accept json
+		// @Produce json
+		// @Param id path int true "Employer ID"
+		// @Param employer body models.Employer true "Updated Employer Data"
+		// @Success 200 {object} map[string]string
+		// @Failure 400 {object} map[string]string
+		// @Failure 404 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /employers/{id} [put]
+		employerGroup.PUT("/:id", controllers.UpdateEmployer)
+
+		// @Summary Delete an employer by ID
+		// @Description Remove an employer from the database using their ID
+		// @Tags Employers
+		// @Produce json
+		// @Param id path int true "Employer ID"
+		// @Success 200 {object} map[string]string
+		// @Failure 404 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /employers/{id} [delete]
+		employerGroup.DELETE("/:id", controllers.DeleteEmployer)
+
+	}
+
+	//    --------------------------------------------------------------------------------------------------------------------------------
+
+	// Employee routes group
+	employeeRoutes := router.Group("/employees")
+	{
+		// @Summary Register a new employee
+		// @Description Sign up a new employee
+		// @Tags Employees
+		// @Accept json
+		// @Produce json
+		// @Param employee body models.Employee true "Employee Data"
+		// @Success 201 {object} map[string]interface{}
+		// @Failure 400 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /employees [post]
+		employeeRoutes.POST("/", controllers.CreateEmployee)
+
+		// @Summary Sign in an employee
+		// @Description Log in an employee with phone and pin
+		// @Tags Employees
+		// @Accept json
+		// @Produce json
+		// @Param credentials body map[string]string true "Phone and Pin"
+		// @Success 200 {object} map[string]interface{}
+		// @Failure 400 {object} map[string]string
+		// @Failure 401 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /employees/sign-in [post]
+		employeeRoutes.POST("/sign-in", controllers.SignInEmployee)
+
+		// @Summary Get all employees
+		// @Description Retrieve a list of all employees
+		// @Tags Employees
+		// @Produce json
+		// @Success 200 {array} models.Employee
+		// @Failure 500 {object} map[string]string
+		// @Router /employees [get]
+		employeeRoutes.GET("/", controllers.GetAllEmployees)
+
+		// @Summary Get an employee by ID
+		// @Description Retrieve an employee's details
+		// @Tags Employees
+		// @Produce json
+		// @Param id path int true "Employee ID"
+		// @Success 200 {object} models.Employee
+		// @Failure 404 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /employees/{id} [get]
+		employeeRoutes.GET("/:id", controllers.GetEmployee)
+
+		// @Summary Update an employee
+		// @Description Modify an employee's details
+		// @Tags Employees
+		// @Accept json
+		// @Produce json
+		// @Param id path int true "Employee ID"
+		// @Param employee body models.Employee true "Updated Employee Data"
+		// @Success 200 {object} map[string]string
+		// @Failure 400 {object} map[string]string
+		// @Failure 404 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /employees/{id} [put]
+		employeeRoutes.PUT("/:id", controllers.UpdateEmployee)
+
+		// @Summary Delete an employee
+		// @Description Remove an employee by ID
+		// @Tags Employees
+		// @Produce json
+		// @Param id path int true "Employee ID"
+		// @Success 200 {object} map[string]string
+		// @Failure 404 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /employees/{id} [delete]
+		employeeRoutes.DELETE("/:id", controllers.DeleteEmployee)
+	}
+
+	//    --------------------------------------------------------------------------------------------------------------------------------
+
+	// JobCard routes group
+	jobCardRoutes := router.Group("/jobcards")
+	{
+		// @Summary Create a new job card
+		// @Description Add a new job card
+		// @Tags JobCards
+		// @Accept json
+		// @Produce json
+		// @Param jobCard body JobCard true "Job Card Data"
+		// @Success 201 {object} map[string]interface{}
+		// @Failure 400 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /jobcards [post]
+		jobCardRoutes.POST("/", controllers.CreateJobCard)
+
+		// @Summary Get all job cards
+		// @Description Retrieve a list of all job cards
+		// @Tags JobCards
+		// @Produce json
+		// @Success 200 {array} JobCard
+		// @Failure 500 {object} map[string]string
+		// @Router /jobcards [get]
+		jobCardRoutes.GET("/", controllers.GetAllJobCards)
+
+		// @Summary Get a job card by ID
+		// @Description Retrieve a job card's details
+		// @Tags JobCards
+		// @Produce json
+		// @Param id path int true "Job Card ID"
+		// @Success 200 {object} JobCard
+		// @Failure 404 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /jobcards/{id} [get]
+		jobCardRoutes.GET("/:id", controllers.GetJobCard)
+
+		// @Summary Update a job card
+		// @Description Modify a job card's details
+		// @Tags JobCards
+		// @Accept json
+		// @Produce json
+		// @Param id path int true "Job Card ID"
+		// @Param jobCard body JobCard true "Updated Job Card Data"
+		// @Success 200 {object} map[string]string
+		// @Failure 400 {object} map[string]string
+		// @Failure 404 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /jobcards/{id} [put]
+		jobCardRoutes.PUT("/:id", controllers.UpdateJobCard)
+
+		// @Summary Delete a job card
+		// @Description Remove a job card by ID
+		// @Tags JobCards
+		// @Produce json
+		// @Param id path int true "Job Card ID"
+		// @Success 200 {object} map[string]string
+		// @Failure 404 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /jobcards/{id} [delete]
+		jobCardRoutes.DELETE("/:id", controllers.DeleteJobCard)
+
+		// @Summary Get active job cards
+		// @Description Retrieve all active job cards
+		// @Tags JobCards
+		// @Produce json
+		// @Success 200 {array} JobCard
+		// @Failure 500 {object} map[string]string
+		// @Router /jobcards/active [get]
+		jobCardRoutes.GET("/active", controllers.GetActiveJobCards)
+
+		// @Summary Update the active status of a job card
+		// @Description Set a job card's active status to true or false
+		// @Tags JobCards
+		// @Accept json
+		// @Produce json
+		// @Param id path int true "Job Card ID"
+		// @Param active body map[string]bool true "Active Status"
+		// @Success 200 {object} map[string]string
+		// @Failure 400 {object} map[string]string
+		// @Failure 404 {object} map[string]string
+		// @Failure 500 {object} map[string]string
+		// @Router /jobcards/{id}/active [put]
+		jobCardRoutes.PUT("/:id/active", controllers.UpdateJobCardActiveStatus)
+
+	}
+
+	jobApplicationGroup := router.Group("/job-applications")
+	{
+		jobApplicationGroup.GET("/", controllers.GetApplicationsByEmployerOrEmployeeHandler)
+
+		jobApplicationGroup.POST("/", controllers.CreateJobApplicationHandler) // Create a new job application
+		jobApplicationGroup.DELETE("/:id", controllers.DeleteJobApplicationHandler)
+		jobApplicationGroup.PUT("/applications/:id/status", controllers.HandleJobApplicationStatus)
+
+		// ratings and comments
+		jobApplicationGroup.POST("/:id/rating", controllers.AddRatingHandler)                              // Add rating and comment
+		jobApplicationGroup.GET("/employee/:employeeId/ratings", controllers.GetRatingsForEmployeeHandler) // Fetch ratings for an employee
+
+	}
+
+	//model related
+
+	campaignGroup := router.Group("/campaigns")
+	{
+		// Routes for managing job campaigns
+		campaignGroup.POST("/", controllers.CreateJobCampaignController)          // Create new campaign
+		campaignGroup.GET("/", controllers.GetAllJobCampaignsController)          // Get all campaigns
+		campaignGroup.GET("/active", controllers.GetActiveJobCampaignsController) // Get active campaigns
+		campaignGroup.GET("/:id", controllers.GetJobCampaignByIDController)       // Get a specific campaign by ID
+		campaignGroup.PUT("/:id", controllers.UpdateJobCampaignController)        // Update a specific campaign
+		campaignGroup.DELETE("/:id", controllers.DeleteJobCampaignController)     // Delete a specific campaign
+	}
+	modelGroup := router.Group("/api")
+	{
+		// Routes for managing job campaigns
+		modelGroup.GET("/export-csv", controllers.ExportEmployeeDataToCSV) // Create new campaign
+		modelGroup.GET("/predict-dropout/:id", controllers.PredictEmployeeDropout)
+
+		//         // Get all campaigns
+	}
+
+	applicationGroup := router.Group("/applications")
+	{
+		// Routes for managing campaign applications
+		applicationGroup.POST("/", controllers.CreateCampaignApplicationController)                       // Apply for a campaign
+		applicationGroup.GET("/campaign/:campaign_id", controllers.GetApplicationsByCampaignIDController) // Get applications for a campaign
+		applicationGroup.PUT("/:id", controllers.UpdateApplicationStatusController)                       // Update application status (e.g., accepted, rejected)
+		applicationGroup.DELETE("/:id", controllers.DeleteCampaignApplicationController)                  // Delete an application
 	}
 
 	return router

@@ -1,4 +1,3 @@
-
 # 🏡 Domestic Help Management Backend
 
 ![Go Version](https://img.shields.io/badge/Go-1.21-blue)  
@@ -64,8 +63,14 @@ domestic_backend/
 │   └── db.go               # PostgreSQL connection and initialization
 ├── middlewares/            # Custom middleware
 │   └── jwt.go              # JWT authentication middleware
+├── routes/                 # API route definitions
+│   └── employer_routes.go  # Employer route handling
+│   └── employee_routes.go  # Employee route handling
+│   └── jobcard_routes.go   # Job card route handling
+│   └── jobapp_routes.go    # Job application route handling
 ├── utils/                  # Utility functions
 │   └── jwt.go              # JWT generation and helpers
+├── docs/                   # Swagger documentation setup
 └── go.mod                  # Go module dependencies
 ```
 
@@ -88,12 +93,52 @@ curl -H "Authorization: Bearer <your-jwt-token>" http://localhost:8080/users
 
 ## 🛠️ API Endpoints
 
-| HTTP Method | Endpoint         | Description                 |
-|-------------|------------------|-----------------------------|
-| **GET**     | `/users`         | Fetch all users             |
-| **POST**    | `/users`         | Create a new user           |
-| **PUT**     | `/users/:id`     | Update a user               |
-| **DELETE**  | `/users/:id`     | Delete a user               |
+### Employer Routes
+Group: `/employers`
+
+| Method | Endpoint               | Description                                |
+|--------|------------------------|--------------------------------------------|
+| POST   | `/`                    | Register a new employer.                  |
+| POST   | `/verify-otp`          | Verify OTP for employer account.          |
+| POST   | `/sign-in`             | Authenticate employer and return JWT.     |
+| GET    | `/`                    | Get a list of all employers.              |
+| GET    | `/{id}`                | Retrieve details of an employer by ID.    |
+| PUT    | `/{id}`                | Update employer details by ID.            |
+| DELETE | `/{id}`                | Delete employer by ID.                    |
+
+### Employee Routes
+Group: `/employees`
+
+| Method | Endpoint               | Description                                |
+|--------|------------------------|--------------------------------------------|
+| POST   | `/`                    | Register a new employee.                  |
+| POST   | `/sign-in`             | Authenticate employee and return JWT.     |
+| GET    | `/`                    | Get a list of all employees.              |
+| GET    | `/{id}`                | Retrieve details of an employee by ID.    |
+| PUT    | `/{id}`                | Update employee details by ID.            |
+| DELETE | `/{id}`                | Delete employee by ID.                    |
+
+### Job Card Routes
+Group: `/jobcards`
+
+| Method | Endpoint               | Description                                |
+|--------|------------------------|--------------------------------------------|
+| POST   | `/`                    | Create a new job card.                    |
+| GET    | `/`                    | Get a list of all job cards.              |
+| GET    | `/{id}`                | Retrieve details of a job card by ID.     |
+| PUT    | `/{id}`                | Update job card details by ID.            |
+| DELETE | `/{id}`                | Delete job card by ID.                    |
+| GET    | `/active`              | Get all active job cards.                 |
+| PUT    | `/{id}/active`         | Update the active status of a job card.   |
+
+### Job Application Routes
+Group: `/job-applications`
+
+| Method | Endpoint               | Description                                |
+|--------|------------------------|--------------------------------------------|
+| POST   | `/`                    | Create a new job application.             |
+| DELETE | `/{id}`                | Delete a job application by ID.           |
+| PUT    | `/applications/{id}/status` | Update the status of a job application. |
 
 ---
 
@@ -158,3 +203,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## 📝 Author
 
 Developed with ❤️ by [2deadmen](https://github.com/2deadmen).
+
